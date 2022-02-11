@@ -58,6 +58,14 @@ while ($true) {
         $span = New-TimeSpan -Start $entry[-1].Start -End $entry[-1].Stop
         $entry[-1].Total = Get-Time -span $span
         $entry | Export-Csv ".\$today.csv"
+        $total = 0
+        foreach ($time in $entry) {
+            $total += [double]$time.total
+            if ($total -ge 8) {
+                Add-Type -AssemblyName PresentationCore, PresentationFramework
+                [System.Windows.MessageBox]::Show("$total hours", "Time")
+            }
+        }
     }
     else {
         $now = Get-Date
