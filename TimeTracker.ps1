@@ -59,11 +59,13 @@ while ($true) {
         $entry[-1].Total = Get-Time -span $span
         $entry | Export-Csv ".\$today.csv"
         $total = 0
+        $complete = $false
         foreach ($time in $entry) {
             $total += [double]$time.total
-            if ($total -ge 8) {
+            if (($total -ge 8) -and ($complete -eq $false)) {
                 Add-Type -AssemblyName PresentationCore, PresentationFramework
                 [System.Windows.MessageBox]::Show("$total hours", "Time")
+                $complete = $true
             }
         }
     }
