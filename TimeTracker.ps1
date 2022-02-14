@@ -41,6 +41,7 @@ function Get-Time {
 $today = Get-Date
 $today = Get-SortableDate -date $today
 $files = Get-ChildItem -Path ".\" -Filter "*.csv"
+$complete = $false
 if ($files -match $today) {
     $now = Get-Date
     $entry = [PSCustomObject]@{
@@ -59,7 +60,6 @@ while ($true) {
         $entry[-1].Total = Get-Time -span $span
         $entry | Export-Csv ".\$today.csv"
         $total = 0
-        $complete = $false
         foreach ($time in $entry) {
             $total += [double]$time.total
             if (($total -ge 8) -and ($complete -eq $false)) {
