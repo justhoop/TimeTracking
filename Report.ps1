@@ -24,6 +24,7 @@ function Get-SortableDate {
 }
 
 $files = Get-ChildItem "*.csv"
+$total = 0
 foreach($file in $files){
     if (($file.name.split('.')[0] -ge (Get-SortableDate $StartDate)) -and ($file.name.split('.')[0] -le (Get-SortableDate $EndDate))) {
         $day = Import-Csv $file
@@ -31,6 +32,12 @@ foreach($file in $files){
         foreach($entry in $day){
             $hours += $entry.Total
         }
-        Write-Host $file.name.split('.')[0]" - "$hours
+        $day = [PSCustomObject]@{
+            Date = $file.name.split('.')[0]
+            Hours = $hours
+        }
+        $total += [float]$hours
+        $day
     }
 }
+write-host "Total hours"$total
