@@ -38,8 +38,7 @@ function Get-Time {
     }
 }
 
-$today = Get-Date
-$today = Get-SortableDate -date $today
+$today = Get-SortableDate -date (Get-Date)
 $files = Get-ChildItem -Path ".\" -Filter "*.csv"
 $complete = $false
 if ($files -match $today) {
@@ -51,34 +50,30 @@ if ($files -match $today) {
     }
     $entry | Export-Csv ".\$today.csv" -Append
 }
+else {
+    $now = Get-Date
+    $entry = [PSCustomObject]@{
+        Start = $now
+        Stop  = $now
+        Total = ""
+    }
+    $entry | Export-Csv ".\$today.csv"
+}
 while ($true) {
-    $files = Get-ChildItem -Path ".\" -Filter "*.csv"
-    if ($files -match $today) {
-        $entry = Import-Csv -Path ($files | Where-Object { $_.Name -eq "$today.csv" }).fullname
-        $entry[-1].Stop = Get-Date
-        $span = New-TimeSpan -Start $entry[-1].Start -End $entry[-1].Stop
-        $entry[-1].Total = Get-Time -span $span
-        $entry | Export-Csv ".\$today.csv"
-        $total = 0
-        foreach ($time in $entry) {
-            $total += [double]$time.total
-            if (($total -ge 8) -and ($complete -eq $false)) {
-                Add-Type -AssemblyName PresentationCore, PresentationFramework
-                [System.Windows.MessageBox]::Show("$total hours", "Time")
-                $complete = $true
-            }
+    $entry = Import-Csv -Path ".\$today.csv"
+    $entry[-1].Stop = Get-Date
+    $span = New-TimeSpan -Start $entry[-1].Start -End $entry[-1].Stop
+    $entry[-1].Total = Get-Time -span $span
+    $entry | Export-Csv ".\$today.csv"
+    $total = 0
+    foreach ($time in $entry) {
+        $total += [double]$time.total
+        if (($total -ge 8) -and ($complete -eq $false)) {
+            Add-Type -AssemblyName PresentationCore, PresentationFramework
+            [System.Windows.MessageBox]::Show("$total hours", "Time")
+            $complete = $true
         }
     }
-    else {
-        $now = Get-Date
-        $entry = [PSCustomObject]@{
-            Start = $now
-            Stop  = $now
-            Total = ""
-        }
-        $entry | Export-Csv ".\$today.csv"
-    }
+    
     Start-Sleep -Seconds 180
 }
-
-
