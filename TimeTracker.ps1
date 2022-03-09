@@ -38,6 +38,25 @@ function Get-Time {
     }
 }
 
+function Update-RecordedTime{
+    param (
+        [string]$today
+    )
+    $changed = $false
+    $day = Import-Csv ".\$today.csv"
+    foreach($entry in $day){
+        $span = New-TimeSpan -Start $entry.Start -End $entry.Stop
+        $hours = Get-Time -span $span
+        if (-not($hours -eq $entry.Total)){
+            $entry.total = $hours
+            $changed = $true
+        }
+    }
+    if ($changed) {
+        $day | Export-Csv ".\$today.csv"
+    }
+}
+
 $today = Get-SortableDate -date (Get-Date)
 $files = Get-ChildItem -Path ".\" -Filter "*.csv"
 $complete = $false
@@ -46,7 +65,7 @@ if ($files -match $today) {
     $entry = [PSCustomObject]@{
         Start = $now
         Stop  = $now
-        Total = ""
+        Total = "0"
     }
     $entry | Export-Csv ".\$today.csv" -Append
 }
@@ -55,10 +74,11 @@ else {
     $entry = [PSCustomObject]@{
         Start = $now
         Stop  = $now
-        Total = ""
+        Total = "0"
     }
     $entry | Export-Csv ".\$today.csv"
 }
+Update-RecordedTime -today $today
 while ($true) {
     $entry = Import-Csv -Path ".\$today.csv"
     $entry[-1].Stop = Get-Date
