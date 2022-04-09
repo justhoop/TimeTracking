@@ -91,7 +91,7 @@ while ($true) {
         if (($total -ge 8) -and ($complete -eq $false)) {
             # Add-Type -AssemblyName PresentationCore, PresentationFramework
             # [System.Windows.MessageBox]::Show("$total hours", "Time")
-            Start-Process "msg" -ArgumentList "$env:USERNAME $hours hours"
+            Start-Process "msg" -ArgumentList "$env:USERNAME $total hours"
             $complete = $true
         }
     }
