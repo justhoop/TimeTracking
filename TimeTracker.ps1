@@ -89,11 +89,11 @@ while ($true) {
     foreach ($time in $entry) {
         $total += [double]$time.total
         if (($total -ge 8) -and ($complete -eq $false)) {
-            Add-Type -AssemblyName PresentationCore, PresentationFramework
-            [System.Windows.MessageBox]::Show("$total hours", "Time")
+            # Add-Type -AssemblyName PresentationCore, PresentationFramework
+            # [System.Windows.MessageBox]::Show("$total hours", "Time")
+            Start-Process "msg" -ArgumentList "$env:USERNAME $hours hours"
             $complete = $true
         }
     }
-    
     Start-Sleep -Seconds 180
 }
